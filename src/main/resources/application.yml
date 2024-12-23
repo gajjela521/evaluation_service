@@ -1,0 +1,28 @@
+# application.yml
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://root:root54321@gajjelsa.rphpwqa.mongodb.net/?retryWrites=true&w=majority&appName=gajjelsa
+      database: evaluation_service
+
+server:
+  port: 8080
+
+# Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+# OpenAPI configuration (replacing springfox)
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+  show-actuator: true
