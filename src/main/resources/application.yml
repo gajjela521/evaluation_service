@@ -2,7 +2,7 @@
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://root:root54321@gajjelsa.rphpwqa.mongodb.net/?retryWrites=true&w=majority&appName=gajjelsa
+      uri: mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@gajjelsa.rphpwqa.mongodb.net/?retryWrites=true&w=majority&appName=gajjelsa
       database: evaluation_service
 
 server:
