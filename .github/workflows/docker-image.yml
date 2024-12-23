@@ -43,7 +43,7 @@ jobs:
 
       - name: Set Render environment variables
         run: |
-          curl -X PATCH https://api.render.com/v1/services/{your-service-id} \
+          curl -X PATCH https://api.render.com/v1/services/srv-ctkq9ta3esus73ear4u0 \
           -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
           -d '{
                 "envVars": [
