@@ -1,19 +1,36 @@
 package com.gajjelsa.evaluation_service.model;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.List;
 
+@Document(collection = "scoreSheets")
+@Data
 public class ScoreSheet {
-
+    @Id
     private String testeeId;
     private List<SubjectScore> subjects;
 
-    // Constructor
     public ScoreSheet(String testeeId, List<SubjectScore> subjects) {
         this.testeeId = testeeId;
         this.subjects = subjects;
     }
 
-    // Getters and Setters
+    public ScoreSheet() {
+
+    }
+
+    @Override
+    public String toString() {
+        return "ScoreSheet{" +
+                "testeeId='" + testeeId + '\'' +
+                ", subjects=" + subjects +
+                '}';
+    }
+
     public String getTesteeId() {
         return testeeId;
     }
@@ -31,6 +48,9 @@ public class ScoreSheet {
     }
 
     // Inner class to represent each subject's score
+    @Data
+    @Document(collection = "subjectScore")
+    @NoArgsConstructor
     public static class SubjectScore {
         private String subject;
         private int totalQuestions;
@@ -38,7 +58,6 @@ public class ScoreSheet {
         private int incorrect;
         private double score;
 
-        // Constructor
         public SubjectScore(String subject, int totalQuestions, int correct, int incorrect) {
             this.subject = subject;
             this.totalQuestions = totalQuestions;
@@ -46,7 +65,6 @@ public class ScoreSheet {
             this.incorrect = incorrect;
         }
 
-        // Getters and Setters
         public String getSubject() {
             return subject;
         }
@@ -85,6 +103,17 @@ public class ScoreSheet {
 
         public void setScore(double score) {
             this.score = score;
+        }
+
+        @Override
+        public String toString() {
+            return "SubjectScore{" +
+                    "subject='" + subject + '\'' +
+                    ", totalQuestions=" + totalQuestions +
+                    ", correct=" + correct +
+                    ", incorrect=" + incorrect +
+                    ", score=" + score +
+                    '}';
         }
     }
 }

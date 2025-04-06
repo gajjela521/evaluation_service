@@ -51,10 +51,6 @@ public class EvaluationService {
             evaluatedScores.add(evaluatedScore);
         }
 
-        // Filtering logic for queryParams (testeeIds, subjects, scoreRange, etc.)
-        // For simplicity, the filtering implementation is minimal. Add your filtering logic here as needed.
-
-        // Sorting by total in descending order and testeeId in ascending order
         evaluatedScores.sort(Comparator.comparingDouble((EvaluatedScores es) -> es.getScores().get("total")).reversed()
                 .thenComparing(EvaluatedScores::getTesteeId));
 

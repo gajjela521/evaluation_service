@@ -1,32 +1,30 @@
 package com.gajjelsa.evaluation_service.model;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.Map;
 
+@Setter
+@Getter
+@Document(collection = "evaluatedScores")
 public class EvaluatedScores {
-
+    @Id
     private String testeeId;
     private Map<String, Double> scores;
 
-    // Constructor
     public EvaluatedScores(String testeeId, Map<String, Double> scores) {
         this.testeeId = testeeId;
         this.scores = scores;
     }
-
-    // Getters and Setters
-    public String getTesteeId() {
-        return testeeId;
+    @Override
+    public String toString() {
+        return "EvaluatedScores{" +
+                "testeeId='" + testeeId + '\'' +
+                ", scores=" + scores +
+                '}';
     }
 
-    public void setTesteeId(String testeeId) {
-        this.testeeId = testeeId;
-    }
-
-    public Map<String, Double> getScores() {
-        return scores;
-    }
-
-    public void setScores(Map<String, Double> scores) {
-        this.scores = scores;
-    }
 }

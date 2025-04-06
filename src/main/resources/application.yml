@@ -7,6 +7,17 @@ spring:
       connection-timeout: 30000
       ssl:
         enabled: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: examnotifications@yourdomain.com
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 server:
   port: 8080
