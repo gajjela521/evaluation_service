@@ -5,8 +5,9 @@ import com.gajjelsa.evaluation_service.model.ExamRegistration;
 import com.gajjelsa.evaluation_service.model.ExamSlot;
 import com.gajjelsa.evaluation_service.model.RegistrationStatus;
 import com.gajjelsa.evaluation_service.model.Subject;
-
-import com.gajjelsa.evaluation_service.repository.EvaluationRepository.*;
+import com.gajjelsa.evaluation_service.repository.ExamSlotRepository;
+import com.gajjelsa.evaluation_service.repository.RegistrationRepository;
+import com.gajjelsa.evaluation_service.repository.SubjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

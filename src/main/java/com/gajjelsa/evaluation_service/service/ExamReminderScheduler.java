@@ -2,7 +2,7 @@ package com.gajjelsa.evaluation_service.service;
 
 import com.gajjelsa.evaluation_service.model.ExamRegistration;
 import com.gajjelsa.evaluation_service.model.RegistrationStatus;
-import com.gajjelsa.evaluation_service.repository.EvaluationRepository;
+import com.gajjelsa.evaluation_service.repository.RegistrationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -13,11 +13,11 @@ import java.util.List;
 @Service
 public class ExamReminderScheduler {
 
-    private final EvaluationRepository.RegistrationRepository registrationRepository;
+    private final RegistrationRepository registrationRepository;
     private final NotificationService notificationService;
 
     @Autowired
-    public ExamReminderScheduler(EvaluationRepository.RegistrationRepository registrationRepository,
+    public ExamReminderScheduler(RegistrationRepository registrationRepository,
                                  NotificationService notificationService) {
         this.registrationRepository = registrationRepository;
         this.notificationService = notificationService;

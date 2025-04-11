@@ -4,7 +4,8 @@ import com.gajjelsa.evaluation_service.model.ExamRegistration;
 import com.gajjelsa.evaluation_service.model.RegistrationStatus;
 import com.gajjelsa.evaluation_service.model.ScoreSheet;
 import com.gajjelsa.evaluation_service.model.Subject;
-import com.gajjelsa.evaluation_service.repository.EvaluationRepository;
+import com.gajjelsa.evaluation_service.repository.RegistrationRepository;
+import com.gajjelsa.evaluation_service.repository.SubjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -17,13 +18,13 @@ import java.util.List;
 public class ExamEvaluationIntegrationService {
 
     private final EvaluationService evaluationService;
-    private final EvaluationRepository.RegistrationRepository registrationRepository;
-    private final EvaluationRepository.SubjectRepository subjectRepository;
+    private final RegistrationRepository registrationRepository;
+    private final SubjectRepository subjectRepository;
 
     @Autowired
     public ExamEvaluationIntegrationService(
             ExamSchedulingService schedulingService,
-            EvaluationService evaluationService, EvaluationRepository.RegistrationRepository registrationRepository, EvaluationRepository.SubjectRepository subjectRepository) {
+            EvaluationService evaluationService, RegistrationRepository registrationRepository, SubjectRepository subjectRepository) {
         this.evaluationService = evaluationService;
         this.registrationRepository = registrationRepository;
         this.subjectRepository = subjectRepository;

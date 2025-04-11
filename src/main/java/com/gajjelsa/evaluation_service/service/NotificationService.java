@@ -5,7 +5,9 @@ import com.gajjelsa.evaluation_service.model.ExamRegistration;
 import com.gajjelsa.evaluation_service.model.ExamSlot;
 import com.gajjelsa.evaluation_service.model.Student;
 import com.gajjelsa.evaluation_service.model.Subject;
-import com.gajjelsa.evaluation_service.repository.EvaluationRepository;
+import com.gajjelsa.evaluation_service.repository.ExamSlotRepository;
+import com.gajjelsa.evaluation_service.repository.StudentRepository;
+import com.gajjelsa.evaluation_service.repository.SubjectRepository;
 import jakarta.mail.internet.MimeMessage;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.DateTime;
@@ -34,16 +36,16 @@ public class NotificationService {
 
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
-    private final EvaluationRepository.ExamSlotRepository slotRepository;
-    private final EvaluationRepository.SubjectRepository subjectRepository;
-    private final EvaluationRepository.StudentRepository studentRepository;
+    private final ExamSlotRepository slotRepository;
+    private final SubjectRepository subjectRepository;
+    private final StudentRepository studentRepository;
 
     @Autowired
     public NotificationService(JavaMailSender mailSender,
                                TemplateEngine templateEngine,
-                               EvaluationRepository.ExamSlotRepository slotRepository,
-                               EvaluationRepository.SubjectRepository subjectRepository,
-                               EvaluationRepository.StudentRepository studentRepository) {
+                               ExamSlotRepository slotRepository,
+                               SubjectRepository subjectRepository,
+                               StudentRepository studentRepository) {
         this.mailSender = mailSender;
         this.templateEngine = templateEngine;
         this.slotRepository = slotRepository;
