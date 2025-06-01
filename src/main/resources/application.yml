@@ -5,12 +5,12 @@ spring:
       uri: mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@gajjelsa.rphpwqa.mongodb.net/?retryWrites=true&w=majority&appName=gajjelsa
       database: evaluation_service
       connection-timeout: 30000
-      ssl:
-        enabled: true
+      sslEnabled: true
+
   mail:
     host: smtp.gmail.com
     port: 587
-    username: examnotifications8080@gmail.com
+    username: "examnotifications8080.prod@gmail.com"
     password: ${MAIL_PASSWORD}
     properties:
       mail:

@@ -1,7 +1,7 @@
 plugins {
-    id 'org.springframework.boot' version '3.2.0'
-    id 'io.spring.dependency-management' version '1.1.4'
     id 'java'
+    id 'org.springframework.boot' version '3.2.0'
+    id 'io.spring.dependency-management' version '1.1.6'
 }
 
 group = 'com.gajjelsa'
@@ -13,39 +13,12 @@ java {
     }
 }
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-    all {
-        resolutionStrategy {
-            // Force specific versions to avoid conflicts
-            force 'org.junit.jupiter:junit-jupiter:5.9.1'
-            force 'org.mockito:mockito-core:4.8.1'
-            force 'org.mockito:mockito-junit-jupiter:4.8.1'
-            force 'net.bytebuddy:byte-buddy:1.12.19'
-            force 'net.bytebuddy:byte-buddy-agent:1.12.19'
-            force 'org.springframework:spring-core:6.0.2'
-            force 'org.springframework:spring-test:6.0.2'
-
-            // Add caching strategy
-            cacheDynamicVersionsFor 0, 'seconds'
-            cacheChangingModulesFor 0, 'seconds'
-        }
-    }
-}
-
 repositories {
     mavenCentral()
-    maven {
-        url 'https://repo.spring.io/milestone'
-        content {
-            includeGroup 'org.springframework'
-        }
-    }
 }
 
 ext {
+    set('springBootVersion', '3.2.0')
     set('springCloudVersion', "2023.0.0")
     set('junitVersion', "5.10.1")
     set('mockitoVersion', "5.7.0")
@@ -53,11 +26,17 @@ ext {
     set('jsonPathVersion', "2.9.0")
 }
 
-dependencies {
-    // Spring Boot starters
-    implementation('org.springframework.boot:spring-boot-starter-web') {
-        exclude group: 'ch.qos.logback', module: 'logback-classic'
+// Use Spring Boot's dependency management instead of manual version overrides
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
     }
+}
+
+dependencies {
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -65,26 +44,18 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-quartz'
 
-    // OpenAPI
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
-    // Calendar and utilities
     implementation 'org.mnode.ical4j:ical4j:3.2.11'
     implementation 'org.mnode.ical4j:ical4j-extensions:1.0.5'
     implementation 'backport-util-concurrent:backport-util-concurrent:3.1'
 
-    // Commons utilities
     implementation 'commons-codec:commons-codec:1.15'
     implementation 'commons-io:commons-io:2.11.0'
-
-    // Logging
     implementation 'org.slf4j:slf4j-api:2.0.7'
 
-    // Lombok
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
 
-    // Test Dependencies
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
@@ -96,73 +67,31 @@ dependencies {
     testImplementation 'org.hamcrest:hamcrest:2.2'
 }
 
-// Test configuration
-tasks.withType(Test).configureEach {
+tasks.named('test') {
     useJUnitPlatform()
-    testLogging {
-        events 'passed', 'skipped', 'failed'
-        showStandardStreams = true
-    }
-    systemProperties = System.properties
-}
-
-// Build scan configuration
-if (hasProperty('buildScan')) {
-    buildScan {
-        termsOfServiceUrl = 'https://gradle.com/terms-of-service'
-        termsOfServiceAgree = 'yes'
-    }
-}
-
-// Compilation configuration
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-    options.compilerArgs += ['-parameters']
-    options.fork = true
-    options.incremental = true
-}
-
-tasks.withType(JavaCompile) {
-    options.release = 21
-}
-
-tasks.withType(Test) {
-    jvmArgs = ['--enable-preview']
-    systemProperty 'java.locale.providers', 'CLDR,SPI'
-}
-
-
-// Archive task configuration
-tasks.withType(AbstractArchiveTask).configureEach {
-    preserveFileTimestamps = false
-    reproducibleFileOrder = true
-}
-
-// Java execution configuration
-tasks.withType(JavaExec).configureEach {
-    jvmArgs '-Dnet.fortuna.ical4j.timezone.update.enabled=false'
-    systemProperty 'net.fortuna.ical4j.parser', 'net.fortuna.ical4j.data.DefaultContentHandler'
-}
-
-// Add dependency locking
-dependencyLocking {
-    lockAllConfigurations()
-}
-
-// Add build info
-springBoot {
-    buildInfo()
-}
-
-tasks.withType(JavaExec) {
-    jvmArgs += [
-        '--enable-preview',
-        '-Djava.locale.providers=CLDR,SPI'
-    ]
-}
-
-test {
     systemProperty 'java.locale.providers', 'CLDR,SPI'
     systemProperty 'file.encoding', 'UTF-8'
     jvmArgs = ['--enable-preview']
+}
+
+tasks.withType(JavaExec).configureEach {
+    jvmArgs += [
+            '--enable-preview',
+            '-Djava.locale.providers=CLDR,SPI'
+    ]
+}
+
+configurations.testImplementation {
+    exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+}
+
+tasks.withType(JavaExec).configureEach {
+    jvmArgs += [
+            '--enable-preview',
+            '-Djava.locale.providers=CLDR,SPI'
+    ]
 }

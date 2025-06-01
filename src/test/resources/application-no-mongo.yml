@@ -1,0 +1,37 @@
+# Test configuration without MongoDB
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration
+      - org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration
+
+  # Mock mail configuration
+  mail:
+    host: localhost
+    port: 25
+    username: test@example.com
+    password: testpassword
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+server:
+  port: 0
+
+# Minimal actuator for tests
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+# Disable OpenAPI for tests
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
