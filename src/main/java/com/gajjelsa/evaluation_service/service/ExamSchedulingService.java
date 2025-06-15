@@ -27,7 +27,6 @@ public class ExamSchedulingService {
     private final RegistrationRepository registrationRepository;
     private final NotificationService notificationService;
 
-
     @Autowired
     public ExamSchedulingService(SubjectRepository subjectRepository,
                                  ExamSlotRepository slotRepository,
@@ -39,7 +38,6 @@ public class ExamSchedulingService {
         this.notificationService = notificationService;
     }
 
-
     /**
      * Retrieves available subjects based on student's class/grade
      */
@@ -49,79 +47,103 @@ public class ExamSchedulingService {
 
     /**
      * Returns available exam slots for a given date
-     * Only returns morning slots (9-11 AM) and afternoon slots (1-4 PM)
+     * TODO: This will be replaced with proper slot creation in Step 2
+     * Currently creates temporary slots for demonstration
      */
     public List<ExamSlot> getAvailableSlots(LocalDate examDate, String subjectId) {
-        // Get predefined slots for the specified date
+        // Get existing slots from database first
+        List<ExamSlot> existingSlots = slotRepository.findBySubjectIdAndExamDate(subjectId, examDate);
+
+        if (!existingSlots.isEmpty()) {
+            return existingSlots;
+        }
+
+        // Temporary: Create predefined slots if none exist (for backward compatibility)
+        // This will be removed in Step 2 when we implement proper exam creation
         List<ExamSlot> availableSlots = new ArrayList<>();
 
         // Morning slots: 9-10 AM and 10-11 AM
-        availableSlots.add(new ExamSlot(examDate, LocalTime.of(9, 0), LocalTime.of(10, 0), subjectId));
-        availableSlots.add(new ExamSlot(examDate, LocalTime.of(10, 0), LocalTime.of(11, 0), subjectId));
+        availableSlots.add(new ExamSlot(examDate, LocalTime.of(9, 0), LocalTime.of(10, 0),
+                subjectId, 30, "Room A101"));
+        availableSlots.add(new ExamSlot(examDate, LocalTime.of(10, 0), LocalTime.of(11, 0),
+                subjectId, 30, "Room A102"));
 
         // Afternoon slots: 1-2 PM, 2-3 PM, and 3-4 PM
-        availableSlots.add(new ExamSlot(examDate, LocalTime.of(13, 0), LocalTime.of(14, 0), subjectId));
-        availableSlots.add(new ExamSlot(examDate, LocalTime.of(14, 0), LocalTime.of(15, 0), subjectId));
-        availableSlots.add(new ExamSlot(examDate, LocalTime.of(15, 0), LocalTime.of(16, 0), subjectId));
+        availableSlots.add(new ExamSlot(examDate, LocalTime.of(13, 0), LocalTime.of(14, 0),
+                subjectId, 30, "Room B101"));
+        availableSlots.add(new ExamSlot(examDate, LocalTime.of(14, 0), LocalTime.of(15, 0),
+                subjectId, 30, "Room B102"));
+        availableSlots.add(new ExamSlot(examDate, LocalTime.of(15, 0), LocalTime.of(16, 0),
+                subjectId, 30, "Room B103"));
 
-        return availableSlots;
+        // Save the temporary slots to database
+        return slotRepository.saveAll(availableSlots);
     }
 
     /**
      * Books an exam slot for a student
-     * Ensures a student can only book one slot per exam day
+     * Fixed: Single method with consistent String types
      */
-    @Transactional("mongoTransactionManager")
+    @Transactional  // Removed mongoTransactionManager reference - will fix in Step 2
     public ExamRegistration bookExamSlot(String studentId, String slotId, String subjectId) {
-        // Find the slot
+        // 1. Validate slot exists
         ExamSlot slot = slotRepository.findById(slotId)
                 .orElseThrow(() -> new GlobalExceptionHandler.SlotNotFoundException("Exam slot not found"));
 
-        // Check for existing bookings on the same day
-        LocalDate examDate = slot.getExamDate();
-        List<Long> slotsForDate = getSlotIdsByDate(examDate);
-        boolean hasExistingBooking = registrationRepository.existsByStudentIdAndSlotIdIn(studentId, slotsForDate);
-
-        if (hasExistingBooking) {
-            throw new GlobalExceptionHandler.DuplicateBookingException("Student has already booked a slot for this exam day");
+        // 2. Validate slot belongs to the requested subject
+        if (!slot.getSubjectId().equals(subjectId)) {
+            throw new GlobalExceptionHandler.SlotNotFoundException("Slot does not match the requested subject");
         }
 
-        // Check slot availability
+        // 3. Check for existing bookings on the same day
+        boolean hasExistingBooking = registrationRepository.existsByStudentIdAndExamDate(
+                studentId, slot.getExamDate());
+
+        if (hasExistingBooking) {
+            throw new GlobalExceptionHandler.DuplicateBookingException(
+                    "Student has already booked a slot for this exam day");
+        }
+
+        // 4. Check if student already booked this specific slot
+        boolean alreadyBookedSlot = registrationRepository.existsByStudentIdAndSlotId(studentId, slotId);
+        if (alreadyBookedSlot) {
+            throw new GlobalExceptionHandler.DuplicateBookingException(
+                    "Student has already booked this specific slot");
+        }
+
+        // 5. Check slot availability
         long currentBookings = registrationRepository.countBySlotId(slotId);
         if (currentBookings >= slot.getCapacity()) {
             throw new GlobalExceptionHandler.SlotFullException("This slot is already at full capacity");
         }
 
-        // Create a new registration object
+        // 6. Create registration
         ExamRegistration registration = new ExamRegistration();
         registration.setStudentId(studentId);
-        registration.setSlotId(slotId);
+        registration.setSlotId(slotId);  // Now String type
         registration.setSubjectId(subjectId);
         registration.setRegistrationTime(LocalDateTime.now());
+        registration.setExamDate(slot.getExamDate());
         registration.setStatus(RegistrationStatus.CONFIRMED);
 
-        // Save and return the registration
         ExamRegistration savedRegistration = registrationRepository.save(registration);
 
-        // Send confirmation email (consider doing this asynchronously)
-        notificationService.sendExamBookingConfirmation(savedRegistration);
+        // 7. Send notification (async)
+        try {
+            notificationService.sendExamBookingConfirmation(savedRegistration);
+        } catch (Exception e) {
+            // Log error but don't fail the booking
+            System.err.println("Failed to send notification: " + e.getMessage());
+        }
 
         return savedRegistration;
     }
 
-    // Update the helper method to return String IDs
-    private List<Long> getSlotIdsByDate(LocalDate date) {
-        List<ExamSlot> slots = slotRepository.findByExamDate(date);
-        return slots.stream().map(ExamSlot::getId).collect(Collectors.toList());
-    }
-
-
-
-
     /**
      * Cancels an existing exam registration
+     * Fixed: Consistent String type usage
      */
-    @Transactional("mongoTransactionManager")
+    @Transactional
     public void cancelExamRegistration(String studentId, String registrationId) {
         ExamRegistration registration = registrationRepository.findById(registrationId)
                 .orElseThrow(() -> new GlobalExceptionHandler.RegistrationNotFoundException("Registration not found"));
@@ -132,7 +154,7 @@ public class ExamSchedulingService {
         }
 
         // Check cancellation policy (e.g., can only cancel 24 hours before exam)
-        ExamSlot slot = slotRepository.findById(String.valueOf(registration.getSlotId()))
+        ExamSlot slot = slotRepository.findById(registration.getSlotId())
                 .orElseThrow(() -> new GlobalExceptionHandler.SlotNotFoundException("Exam slot not found"));
 
         LocalDateTime examDateTime = LocalDateTime.of(slot.getExamDate(), slot.getStartTime());
@@ -146,40 +168,22 @@ public class ExamSchedulingService {
         registrationRepository.delete(registration);
 
         // Send cancellation notification
-        notificationService.sendExamCancellationNotification(studentId, registration);
-    }
-
-
-    /**
-     * Books an exam slot for a student and sends confirmation email
-     */
-    @Transactional("mongoTransactionManager")
-    public ExamRegistration bookExamSlot(String studentId, Long slotId, String subjectId) {
-        ExamRegistration registration = new ExamRegistration();
-        registration.setStudentId(studentId);
-        registration.setSlotId(String.valueOf(slotId));
-        registration.setSubjectId(subjectId);
-        registration.setRegistrationTime(LocalDateTime.now());
-        registration.setStatus(RegistrationStatus.CONFIRMED);
-
-        ExamRegistration savedRegistration = registrationRepository.save(registration);
-
-        // Send confirmation email asynchronously
-        notificationService.sendExamBookingConfirmation(savedRegistration);
-
-        return savedRegistration;
+        try {
+            notificationService.sendExamCancellationNotification(studentId, registration);
+        } catch (Exception e) {
+            // Log error but don't fail the cancellation
+            System.err.println("Failed to send cancellation notification: " + e.getMessage());
+        }
     }
 
     /**
-     * Cancels an existing exam registration and sends cancellation email
+     * Helper method to get slot IDs by date
+     * Fixed: Return type changed from List<Long> to List<String>
      */
-    @Transactional("mongoTransactionManager")
-    public void cancelExamRegistration(String studentId, Long registrationId) {
-        ExamRegistration registration = registrationRepository.findById(String.valueOf(registrationId))
-                .orElseThrow(() -> new GlobalExceptionHandler.RegistrationNotFoundException("Registration not found"));
-                registrationRepository.delete(registration);
-
-        notificationService.sendExamCancellationNotification(studentId, registration);
+    private List<String> getSlotIdsByDate(LocalDate date) {
+        List<ExamSlot> slots = slotRepository.findByExamDate(date);
+        return slots.stream().map(ExamSlot::getId).collect(Collectors.toList());
     }
 
+    // Removed the duplicate bookExamSlot method with Long slotId parameter
 }

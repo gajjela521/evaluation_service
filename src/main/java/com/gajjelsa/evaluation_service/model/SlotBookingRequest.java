@@ -10,20 +10,35 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "slotBookings")
 public class SlotBookingRequest {
     @Id
-    private String studentId;
-    private Long slotId;
-    private String subjectId;
+    private String id;          // Added proper ID for the request
+    private String studentId;   // Already correct
+    private String slotId;      // Fixed: Changed from Long to String
+    private String subjectId;   // Already correct
 
-    public SlotBookingRequest(String studentId, Long slotId, String subjectId) {
+    // Default constructor
+    public SlotBookingRequest() {}
+
+    // Constructor without ID (for creating new requests)
+    public SlotBookingRequest(String studentId, String slotId, String subjectId) {
         this.studentId = studentId;
         this.slotId = slotId;
         this.subjectId = subjectId;
     }
+
+    // Full constructor
+    public SlotBookingRequest(String id, String studentId, String slotId, String subjectId) {
+        this.id = id;
+        this.studentId = studentId;
+        this.slotId = slotId;
+        this.subjectId = subjectId;
+    }
+
     @Override
     public String toString() {
         return "SlotBookingRequest{" +
-                "studentId='" + studentId + '\'' +
-                ", slotId=" + slotId +
+                "id='" + id + '\'' +
+                ", studentId='" + studentId + '\'' +
+                ", slotId='" + slotId + '\'' +
                 ", subjectId='" + subjectId + '\'' +
                 '}';
     }

@@ -13,7 +13,7 @@ import java.time.LocalTime;
 @Document(collection = "examSlots")
 public class ExamSlot {
     @Id
-    private Long id;
+    private String id;  // Fixed: Changed from Long to String
     private LocalDate examDate;
     private LocalTime startTime;
     private LocalTime endTime;
@@ -21,7 +21,12 @@ public class ExamSlot {
     private int capacity;
     private String location;
 
-    public ExamSlot(Long id, LocalDate examDate, LocalTime startTime, LocalTime endTime, String subjectId, int capacity, String location) {
+    // Default constructor for MongoDB
+    public ExamSlot() {}
+
+    // Full constructor
+    public ExamSlot(String id, LocalDate examDate, LocalTime startTime, LocalTime endTime,
+                    String subjectId, int capacity, String location) {
         this.id = id;
         this.examDate = examDate;
         this.startTime = startTime;
@@ -31,13 +36,21 @@ public class ExamSlot {
         this.location = location;
     }
 
-    public ExamSlot(LocalDate examDate, LocalTime of, LocalTime of1, String subjectId) {
+    // Constructor without ID (for creating new slots)
+    public ExamSlot(LocalDate examDate, LocalTime startTime, LocalTime endTime,
+                    String subjectId, int capacity, String location) {
+        this.examDate = examDate;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.subjectId = subjectId;
+        this.capacity = capacity;
+        this.location = location;
     }
 
     @Override
     public String toString() {
         return "ExamSlot{" +
-                "id=" + id +
+                "id='" + id + '\'' +
                 ", examDate=" + examDate +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
