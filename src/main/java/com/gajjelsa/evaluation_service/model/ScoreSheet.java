@@ -49,8 +49,7 @@ public class ScoreSheet {
 
     // Inner class to represent each subject's score
     @Data
-    @Document(collection = "subjectScore")
-    @NoArgsConstructor
+    @NoArgsConstructor  // Fixed: Removed @Document annotation - this is embedded, not a separate collection
     public static class SubjectScore {
         private String subject;
         private int totalQuestions;
@@ -63,6 +62,7 @@ public class ScoreSheet {
             this.totalQuestions = totalQuestions;
             this.correct = correct;
             this.incorrect = incorrect;
+            // Score will be calculated by service
         }
 
         public String getSubject() {
