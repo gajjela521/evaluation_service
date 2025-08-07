@@ -44,6 +44,7 @@ public class ExamSchedulingController {
     @PostMapping("/book")
     public ResponseEntity<ExamRegistration> bookExamSlot(@Valid @RequestBody SlotBookingRequest request) {
         try {
+            // Fixed: slotId is now String type
             ExamRegistration registration = schedulingService.bookExamSlot(
                     request.getStudentId(), request.getSlotId(), request.getSubjectId());
             return ResponseEntity.ok(registration);
@@ -61,7 +62,7 @@ public class ExamSchedulingController {
     public ResponseEntity<Void> cancelRegistration(
             @PathVariable String registrationId,
             @RequestParam String studentId) {
-        schedulingService.cancelExamRegistration(studentId, Long.valueOf(registrationId));
+        schedulingService.cancelExamRegistration(studentId, registrationId);
         return ResponseEntity.noContent().build();
     }
 }
