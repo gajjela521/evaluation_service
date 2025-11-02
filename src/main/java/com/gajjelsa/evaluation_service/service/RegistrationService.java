@@ -50,13 +50,20 @@ public class RegistrationService {
         user = userRepository.save(user);
 
         // Create Student
-        Student student = new Student(null, request.getName(), request.getEmail(),
-                request.getClassId(), request.getContactNumber(),
-                request.getAddress(), parseDateOfBirth(request.getDateOfBirth()));
+        Student student = new Student();
         student.setUserId(user.getId());
+        student.setFullName(request.getName());
+        student.setEmail(request.getEmail());
         student.setEnrollmentNumber(request.getEnrollmentNumber());
         student.setDepartment(request.getDepartment());
         student.setSemester(request.getSemester());
+
+        // Optional fields
+        student.setClassId(request.getClassId());
+        student.setContactNumber(request.getContactNumber());
+        student.setAddress(request.getAddress());
+        student.setDateOfBirth(parseDateOfBirth(request.getDateOfBirth()));
+
         studentRepository.save(student);
 
         return createAuthResponse(user, "Student registration successful. Pending admin approval.");
