@@ -1,0 +1,33 @@
+# Build directories
+.gradle
+build
+target
+bin
+out
+
+# IDE files
+.idea
+.vscode
+*.iml
+*.ipr
+*.iws
+.DS_Store
+
+# Git
+.git
+.gitignore
+
+# Logs
+*.log
+logs
+
+# Local env files
+*.env.local
+application-local.yml
+
+# Documentation
+*.md
+docs
+
+# Test files (optional - remove if you want to run tests in container)
+src/test
