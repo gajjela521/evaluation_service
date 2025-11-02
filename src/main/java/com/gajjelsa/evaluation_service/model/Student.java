@@ -22,6 +22,12 @@ public class Student {
     private String address;
     private LocalDate dateOfBirth;
 
+    // New fields for authentication and registration
+    private String userId; // Reference to User for auth
+    private String enrollmentNumber;
+    private String department;
+    private Integer semester;
+
     public Student(String id, String fullName, String email, String classId, String contactNumber, String address, LocalDate dateOfBirth) {
         this.id = id;
         this.fullName = fullName;
