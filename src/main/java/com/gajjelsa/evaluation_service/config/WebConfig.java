@@ -14,11 +14,10 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins(
-                                "http://localhost:5173",  // Vite dev server
-                                "http://localhost:4173",  // Vite preview
-                                "http://localhost:3000",  // Alternative port
-                                "https://evaluation-service-frontend.vercel.app", // Production
+                        .allowedOriginPatterns(
+                                "http://localhost:*",  // Local development
+                                "https://*.onrender.com",  // Render deployments
+                                "https://evaluation-service-frontend.vercel.app", // Vercel
                                 "https://gajjela521.github.io"  // GitHub Pages
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
